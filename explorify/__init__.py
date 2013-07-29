@@ -11,8 +11,10 @@ app = Flask(__name__)
 def get_track_data(album_id):
   url = "http://ws.spotify.com/lookup/1/.json" + \
           "?uri=spotify:album:%s&extras=trackdetail" % album_id
-  resp = requests.get(url)
-  tracks = resp.json()['album']['tracks']
+  resp = requests.get(url).json()
+  artist = resp['album']['artist']
+  album_name = resp['album']['name']
+  tracks = resp['album']['tracks']
 
   pops = [float(t['popularity']) for t in tracks]
   pop_max = max(pops)
@@ -35,7 +37,22 @@ def get_track_data(album_id):
     'min':    pop_min,
     'mean':   mean(pops),
     'median': median(pops),
+    'name':   album_name,
+    'artist': artist,
   })
 
+@app.after_request
+def add_cors_header(response):
+  from flask import request
+  origin = request.headers.get('Origin', '')
+  if origin in ['null']:
+    response.headers['Access-Control-Allow-Origin'] = origin
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
+    response.headers['Access-Control-Allow-Headers'] = \
+      'Content-Type, Pragma, Cache-Control, *'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE'
+  return response
+
+
 if __name__ == "__main__":
-  app.run()
+  app.run(host='0.0.0.0', port=5001)
