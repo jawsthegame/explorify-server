@@ -1,6 +1,7 @@
 import json
 import requests
 
+from collections import defaultdict
 from flask import Flask
 from numpy import mean, median
 
@@ -20,6 +21,9 @@ def get_track_data(album_id):
   pop_max = max(pops)
   pop_min = min(pops)
   pop_range = pop_max - pop_min
+  pop_sum = sum(pops)
+
+  rel_pop_sum = sum([(pop - pop_min) / pop_range for pop in pops])
 
   track_data = []
   last_track = 0
@@ -28,6 +32,8 @@ def get_track_data(album_id):
 
   for t in tracks:
     pop = float(t['popularity'])
+    rel_pop = (pop - pop_min) / pop_range
+    share_pop = rel_pop / rel_pop_sum
     disc = int(t['disc-number'])
     track = int(t['track-number'])
 
@@ -36,10 +42,11 @@ def get_track_data(album_id):
       add_to_track += last_track
 
     track_data.append({
-      'name':     t['name'],
-      'num':      track + add_to_track,
-      'pop':      pop,
-      'rel_pop':  round((pop - pop_min) / pop_range, 2)
+      'name':       t['name'],
+      'num':        track + add_to_track,
+      'pop':        pop,
+      'rel_pop':    round(rel_pop, 2),
+      'share_pop':  round(share_pop, 2)
     })
 
     last_track = track
