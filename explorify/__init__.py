@@ -22,14 +22,27 @@ def get_track_data(album_id):
   pop_range = pop_max - pop_min
 
   track_data = []
+  last_track = 0
+  current_disc = 1
+  add_to_track = 0
+
   for t in tracks:
     pop = float(t['popularity'])
+    disc = int(t['disc-number'])
+    track = int(t['track-number'])
+
+    if disc > current_disc:
+      current_disc = disc
+      add_to_track += last_track
+
     track_data.append({
       'name':     t['name'],
-      'num':      int(t['track-number']),
+      'num':      track + add_to_track,
       'pop':      pop,
       'rel_pop':  round((pop - pop_min) / pop_range, 2)
     })
+
+    last_track = track
 
   return json.dumps({
     'tracks': track_data,
