@@ -1,28 +1,41 @@
-import csv
+import json
 import requests
-import StringIO
 
 from flask import Flask
+from numpy import mean, median
+
+
 app = Flask(__name__)
 
-
-@app.route("/:album_id")
+@app.route("/<album_id>")
 def get_track_data(album_id):
-  resp = requests.get(
-    "http:/ws.spotify.com/lookup/1/.json?uri=spotify:album:%s" % album_id)
+  url = "http://ws.spotify.com/lookup/1/.json" + \
+          "?uri=spotify:album:%s&extras=trackdetail" % album_id
+  resp = requests.get(url)
   tracks = resp.json()['album']['tracks']
-  track_data = [(t['name'], t['track-number'], t['popularity']) \
-                for t in tracks]
 
-  fp = StringIO.StringIO()
-  writer = csv.writer(fp)
-  track_data = sorted(track_data, key=lambda t: t[1])
-  for track in track_data:
-    name, num, pop = track
-    writer.writerow([name, num, pop])
+  pops = [float(t['popularity']) for t in tracks]
+  pop_max = max(pops)
+  pop_min = min(pops)
+  pop_range = pop_max - pop_min
 
-  writer.flush()
-  return fp.getvalue()
+  track_data = []
+  for t in tracks:
+    pop = float(t['popularity'])
+    track_data.append({
+      'name':     t['name'],
+      'num':      int(t['track-number']),
+      'pop':      pop,
+      'rel_pop':  round((pop - pop_min) / pop_range, 2)
+    })
+
+  return json.dumps({
+    'tracks': track_data,
+    'max':    pop_max,
+    'min':    pop_min,
+    'mean':   mean(pops),
+    'median': median(pops),
+  })
 
 if __name__ == "__main__":
   app.run()
