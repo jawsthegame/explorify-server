@@ -1,4 +1,6 @@
 explorify-server
 ================
 
-create spotify playlists
+explorify is a set of visualizations for Spotify.
+
+this repository contains the server
