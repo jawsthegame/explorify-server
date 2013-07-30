@@ -65,7 +65,7 @@ def get_track_data(album_id):
 def add_cors_header(response):
   from flask import request
   origin = request.headers.get('Origin', '')
-  if origin in ['null', 'http://explorify.jawsapps.com']:
+  if origin in ['http://localhost:9000', 'http://explorify.jawsapps.com']:
     response.headers['Access-Control-Allow-Origin'] = origin
     response.headers['Access-Control-Allow-Credentials'] = 'true'
     response.headers['Access-Control-Allow-Headers'] = \
