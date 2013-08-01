@@ -1,10 +1,12 @@
 from flask import Flask
 
 from explorify.views.album import albums
+from explorify.views.artist import artists
 
 
 app = Flask(__name__)
 app.register_blueprint(albums, url_prefix='/album')
+app.register_blueprint(artists, url_prefix='/artist')
 
 @app.after_request
 def add_cors_header(response):
