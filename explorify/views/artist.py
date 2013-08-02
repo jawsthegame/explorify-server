@@ -40,7 +40,19 @@ def get_album_data(artist_id):
       return artist_name, albums
 
     artist_name, albums = get_data(artist_id)
+
+    pops = [(a['pop']) for a in albums]
+    pop_max = max(pops)
+    pop_min = min(pops)
+    pop_range = pop_max - pop_min
+    pop_sum = sum(pops)
+    rel_pop_sum = sum([(pop - pop_min) / pop_range for pop in pops])
+
+    for album in albums:
+      album['rel_pop'] = round((album['pop'] - pop_min) / pop_range, 3)
+
     album_data = sorted(albums, key=lambda a: a['year'])
+
     return json.dumps({
       'artist': artist_name,
       'albums': album_data,
