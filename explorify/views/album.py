@@ -44,8 +44,8 @@ def get_track_data(album_id):
       'name':       t['name'],
       'num':        track + add_to_track,
       'pop':        pop,
-      'rel_pop':    round(rel_pop, 2),
-      'share_pop':  round(share_pop, 2)
+      'rel_pop':    round(rel_pop, 3),
+      'share_pop':  round(share_pop, 3)
     })
 
     last_track = track
