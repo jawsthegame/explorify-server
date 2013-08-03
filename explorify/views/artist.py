@@ -8,6 +8,26 @@ from numpy import mean
 
 artists = Blueprint('artists', __name__)
 
+@artists.route('/<artist_id>/albums')
+def get_album_uris(artist_id):
+  try:
+    artist_url = 'http://ws.spotify.com/lookup/1/.json' + \
+                 '?uri=spotify:artist:%s&extras=album' % artist_id
+    artist_resp = requests.get(artist_url).json()
+    artist_name = artist_resp['artist']['name']
+    albums = []
+    album_names = set()
+    for album in artist_resp['artist']['albums']:
+      name = album['album']['name']
+      if name not in album_names \
+          and album['album']['artist'] == artist_name \
+          and 'US' in album['album']['availability']['territories']:
+        album_names.add(name)
+        albums.append(album['album']['href'])
+    return json.dumps(albums)
+  except Exception as e:
+    print e
+
 @artists.route('/<artist_id>')
 def get_album_data(artist_id):
   try:
