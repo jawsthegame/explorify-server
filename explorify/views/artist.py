@@ -20,7 +20,7 @@ def get_album_data(artist_id):
       album_names = set()
       for album in artist_resp['artist']['albums']:
         name = album['album']['name']
-        if name not in album_names:
+        if name not in album_names and album['album']['artist'] == artist_name:
           album_names.add(name)
           album_id = album['album']['href'].replace('spotify:album:', '')
           album_url = "http://ws.spotify.com/lookup/1/.json" + \
