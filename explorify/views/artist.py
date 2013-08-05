@@ -19,10 +19,11 @@ def get_album_uris(artist_id):
     album_names = set()
     for album in artist_resp['artist']['albums']:
       name = album['album']['name']
-      if name not in album_names \
+      key = name.lower()
+      if key not in album_names \
           and album['album']['artist'] == artist_name \
           and 'US' in album['album']['availability']['territories']:
-        album_names.add(name)
+        album_names.add(key)
         albums.append(album['album']['href'])
     return json.dumps(albums)
   except Exception as e:
@@ -40,8 +41,9 @@ def get_album_data(artist_id):
       album_names = set()
       for album in artist_resp['artist']['albums']:
         name = album['album']['name']
-        if name not in album_names and album['album']['artist'] == artist_name:
-          album_names.add(name)
+        key = name.lower()
+        if key not in album_names and album['album']['artist'] == artist_name:
+          album_names.add(key)
           album_id = album['album']['href'].replace('spotify:album:', '')
           album_url = "http://ws.spotify.com/lookup/1/.json" + \
                       "?uri=spotify:album:%s&extras=trackdetail" % album_id
